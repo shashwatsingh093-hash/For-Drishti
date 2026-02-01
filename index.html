@@ -16,7 +16,7 @@
       align-items: center;
       justify-content: center;
       min-height: 100vh;
-      overflow: hidden;
+      overflow-x: hidden;
       color: #fff;
       text-align: center;
       padding: 20px;
@@ -31,12 +31,13 @@
     .card {
       background: rgba(255, 255, 255, 0.18);
       backdrop-filter: blur(12px);
-      padding: 30px 22px;
+      padding: 30px 20px;
       border-radius: 24px;
       box-shadow: 0 15px 40px rgba(0,0,0,0.25);
+      width: 90%;
       max-width: 420px;
-      width: 100%;
       animation: popIn 0.8s ease;
+      box-sizing: border-box;
     }
 
     @keyframes popIn {
@@ -68,6 +69,7 @@
       display: flex;
       justify-content: center;
       gap: 12px;
+      flex-wrap: wrap;
     }
 
     button {
@@ -76,6 +78,12 @@
       border: none;
       border-radius: 50px;
       cursor: pointer;
+      min-width: 130px;
+      transition: transform 0.2s ease;
+    }
+
+    button:active {
+      transform: scale(0.96);
     }
 
     .yes {
@@ -102,18 +110,40 @@
       10% { opacity: 1; }
       100% { transform: translateY(-120vh); opacity: 0; }
     }
+
+    /* Small screen adjustments */
+    @media (max-width: 360px) {
+      .card {
+        padding: 25px 15px;
+        border-radius: 20px;
+      }
+      h1 { font-size: 1.8rem; }
+      p { font-size: 0.95rem; }
+      button { padding: 12px 20px; font-size: 1rem; min-width: 100px; }
+    }
+
+    #celebrate-banner {
+      position: fixed;
+      top: -80px;
+      left: 0;
+      width: 100%;
+      text-align: center;
+      font-family:'Pacifico',cursive;
+      font-size: 2rem;
+      color: #fff;
+      z-index: 10;
+      transition: top 0.6s ease;
+    }
   </style>
 </head>
 <body>
 
-<!-- 🎵 Background Music -->
+<!-- Background music -->
 <audio id="bgMusic" loop>
   <source src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_5c7c3f3a64.mp3" type="audio/mpeg">
 </audio>
 
-<div id="celebrate-banner" style="position:fixed;top:-80px;left:0;width:100%;font-family:'Pacifico',cursive;font-size:2rem;transition:top 0.6s ease;">
-  🎉 LOVE MODE ACTIVATED 🎉
-</div>
+<div id="celebrate-banner">🎉 LOVE MODE ACTIVATED 🎉</div>
 
 <div class="card" id="card">
   <h1>Hey Drishti 💕</h1>
@@ -127,7 +157,7 @@
 
   <div class="buttons">
     <button class="yes" onclick="yesClicked()">YES 💖</button>
-    <button class="no" onclick="noClicked()">NO 🙃</button>
+    <button class="no">NO 🙃</button>
   </div>
 
   <div id="message"></div>
@@ -137,13 +167,12 @@
   const noBtn = document.querySelector('.no');
   const music = document.getElementById('bgMusic');
 
-  function noClicked() {
-    document.getElementById('message').innerHTML = "❌ Incorrect Answer. Try again 😌";
-  }
-
   function yesClicked() {
-    music.volume = 0.4;
-    music.play();
+    // Play music after user interaction
+    if (music.paused) {
+      music.volume = 0.4;
+      music.play().catch(() => console.log("User interaction required"));
+    }
 
     showBanner();
     explodeHearts();
@@ -163,11 +192,14 @@
     `;
   }
 
-  noBtn.addEventListener('mouseover', () => {
+  // NO button moves when hovered/touched
+  noBtn.addEventListener('mouseover', moveNoButton);
+  noBtn.addEventListener('touchstart', moveNoButton);
+  function moveNoButton() {
     const x = Math.random() * 180 - 90;
     const y = Math.random() * 120 - 60;
     noBtn.style.transform = `translate(${x}px, ${y}px)`;
-  });
+  }
 
   function showBanner(){
     const b = document.getElementById('celebrate-banner');
@@ -202,6 +234,17 @@
       setTimeout(()=>c.remove(),3000);
     }
   }
+
+  // gently floating hearts in background
+  setInterval(() => {
+    const heart = document.createElement('div');
+    heart.className = 'heart';
+    heart.innerText = '💖';
+    heart.style.left = Math.random() * 100 + 'vw';
+    heart.style.animationDuration = 4 + Math.random() * 4 + 's';
+    document.body.appendChild(heart);
+    setTimeout(() => heart.remove(), 8000);
+  }, 500);
 </script>
 
 </body>
